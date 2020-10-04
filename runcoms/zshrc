@@ -1,13 +1,71 @@
-#
-# Executes commands at the start of an interactive session.
-#
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
+# aliases
+alias vim='nvim'
+alias open='xdg-open'
 
-# Source Prezto.
+# change ls dir colors
+eval "$(dircolors ~/.dircolors)"
+
+# Disable C-S freezing the terminal
+stty -ixon
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/minhduc0711/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+  eval "$__conda_setup"
+else
+  if [ -f "/home/minhduc0711/miniconda3/etc/profile.d/conda.sh" ]; then
+    . "/home/minhduc0711/miniconda3/etc/profile.d/conda.sh"
+  else
+    export PATH="/home/minhduc0711/miniconda3/bin:$PATH"
+  fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+# env suggetions for conda
+fpath+=/home/minhduc0711/.conda-zsh-completion
+
+# conda auto activating env when in project dir
+#source conda_auto_env
+
+# NodeJS
+export NODEJS_HOME=/opt/node-v12.18.3-linux-x64/bin
+export PATH=$NODEJS_HOME:$PATH
+
+# access jupyter lab instance on remote server
+function jllocal {
+  remote_username=ducpm
+  remote_hostname=ictlab.usth.edu.vn
+  # open urls on browser after forwarding
+  (sleep 2; 
+  for p in "$@"; do
+    url="http://localhost:${p}"
+    echo "opening $url"
+    #xdg-open $url
+  done) &
+  # Forward ports 
+  forward_args=""
+  for p in "$@"; do
+    forward_args="${forward_args}-L localhost:${p}:localhost:${p} "
+  done
+  ssh_cmd="ssh -p 22222 -CN $remote_username@$remote_hostname $forward_args"
+  echo $ssh_cmd
+  eval $ssh_cmd
+}
+
+# use fd instead of find for fzf
+alias fd=fdfind
+export FZF_DEFAULT_COMMAND='fdfind --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# prezto init
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Customize to your needs...
+# add fzf key bindings, this must go after prezto init
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+
+# starship prompt
+eval "$(starship init zsh)"
