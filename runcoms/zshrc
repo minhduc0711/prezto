@@ -46,10 +46,6 @@ if [[ -e ~/.autoenv/activate.sh ]]; then
   source ~/.autoenv/activate.sh
 fi
 
-# NodeJS
-export NODEJS_HOME=/opt/node-v14.15.1-linux-x64/bin
-export PATH=$NODEJS_HOME:$PATH
-
 # access jupyter lab instance on remote server
 function jllocal {
   remote_username=ducpm
