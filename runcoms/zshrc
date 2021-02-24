@@ -23,6 +23,7 @@ export KEYTIMEOUT=1
 # aliases
 alias vim='nvim'
 alias open='xdg-open'
+alias git-delete-squashed='git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse $branch\^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -48,21 +49,21 @@ fi
 
 # access jupyter lab instance on remote server
 function jllocal {
-  remote_username=ducpm
-  remote_hostname=ictlab.usth.edu.vn
+  host=$1
+  shift
   # open urls on browser after forwarding
   (sleep 2; 
   for p in "$@"; do
     url="http://localhost:${p}"
     echo "opening $url"
-    #xdg-open $url
+    xdg-open $url
   done) &
   # Forward ports 
   forward_args=""
   for p in "$@"; do
-    forward_args="${forward_args}-L localhost:${p}:localhost:${p} "
+    forward_args="${forward_args} -L localhost:${p}:localhost:${p}"
   done
-  ssh_cmd="ssh -p 22222 -CN $remote_username@$remote_hostname $forward_args"
+  ssh_cmd="ssh -CN $host $forward_args"
   echo $ssh_cmd
   eval $ssh_cmd
 }
